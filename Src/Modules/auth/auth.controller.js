@@ -76,6 +76,12 @@ export const profile=catchError(async(req, res, next)=>{
     res.json({message:"get profile successfully",data:user})
 })
 
+
+/**
+ * Logs out a user.
+ * @param {string} token - The access token from the request headers.
+ * @returns {object} - A success message indicating the user has logged out.
+ */
 export const logout=catchError(async(req,res,next)=>{
     //get user from token
     const token=req.headers.token.split(' ')[1]
@@ -87,5 +93,30 @@ export const logout=catchError(async(req,res,next)=>{
     await Token.deleteOne({userId:id})
     
     res.json({message:"logout successfully"})
+})
+
+
+/**
+ * Refreshes an access token.
+ * @param {string} refreshToken - The refresh token from the request headers.
+ * @throws {Error} -if the refresh token not valid
+ * @returns {access_token} 
+ */
+export const refreshToken=catchError(async(req,res,next)=>{
+    //get refresh token from request headers
+    const refreshToken=req.headers.token.split(' ')[1]
+    
+    //verify refresh token
+    const {id}=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET)
+
+    //get user from database
+    const user=await User.findById(id)
+    
+    if(!user)  return next(new AppEroor("invalid refresh token",401));
+    
+    //generate new access token
+    const access_token=jwt.sign({id:user._id},process.env.ACCSESS_TOKEN_SECRET,{expiresIn:"8h"})
+    
+    res.json({message:"refresh token successfully",access_token})
 })
 

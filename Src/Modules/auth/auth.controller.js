@@ -109,6 +109,10 @@ export const refreshToken=catchError(async(req,res,next)=>{
     //verify refresh token
     const {id}=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET)
 
+    //check if refresh token exists in database
+    const token=await Token.findOne({refreshToken,userId:id})
+    if(!token)  return next(new AppEroor("invalid refresh token",401));
+
     //get user from database
     const user=await User.findById(id)
     

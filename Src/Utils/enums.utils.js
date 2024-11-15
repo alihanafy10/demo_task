@@ -4,3 +4,9 @@ export const levelType = {
     JUNIOR: "junior",
     MIDLEVEL:"midLevel"
   };
+
+  export const priorityType = {
+    LOW: "low",
+    MEDIUM: "medium",
+    HIGH: "high"
+  }

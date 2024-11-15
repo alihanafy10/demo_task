@@ -1,6 +1,6 @@
 import { hashSync } from "bcrypt";
-import mongoose from "mongoose";
-import { levelType } from "../../Src/Utils/index.js";
+import mongoose from "../global-setup.js";
+import { levelType, systemRoles } from "../../Src/Utils/index.js";
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
@@ -29,7 +29,13 @@ const userSchema = new Schema({
     type:String,
     required: true,
     enum:Object.values(levelType)
-   }
+   },
+   role:{
+    type: String,
+    required: true,
+    enum: Object.values(systemRoles),
+    default:systemRoles.USER
+   },
 
 }, { timestamps: true });
 

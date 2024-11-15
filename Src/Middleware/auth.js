@@ -10,7 +10,8 @@ import { catchError } from './Error-handdling.middleware.js'
 export const auth=catchError(
     async(req,res,next)=>{
         //destructing the token from req
-        const {token}=req.headers
+        const token=req.headers.authorization
+        
         if(!token)return next(new AppEroor('signin first',401))
     
             //verify token
@@ -31,9 +32,6 @@ export const auth=catchError(
                  }
                 if(!decodeData.id)return next(new AppEroor('invalid token',400))
 
-                    //check if refresh token is existing
-                    const refreshToken = await Token.findOne({userId:decodeData.id})
-                    if(!refreshToken)return next(new AppEroor("please login first",401))
                         
                     //find user
                 const user=await User.findById(decodeData.id).select('-password')

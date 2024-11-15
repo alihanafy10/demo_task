@@ -50,7 +50,7 @@ export const signin=catchError(async(req,res,next)=>{
     //save refresh token to database
     await Token.create({refreshToken:refresh_token,userId:user._id})
     
-    res.json({message:"login successfully",access_token,refresh_token})
+    res.status(201).json({message:"login successfully",access_token,refresh_token})
 })
 
 
@@ -60,7 +60,7 @@ export const signin=catchError(async(req,res,next)=>{
  */
 export const profile=catchError(async(req, res, next)=>{
     //get user from token
-    const token=req.headers.token.split(' ')[1]
+    const token=req.headers.authorization.split(' ')[1]
     
     //verify access token and featch id
     const {id}=jwt.verify(token,process.env.ACCSESS_TOKEN_SECRET)
@@ -73,7 +73,7 @@ export const profile=catchError(async(req, res, next)=>{
     //ignore password
     user.password=undefined
     
-    res.json({message:"get profile successfully",data:user})
+    res.status(200).json({message:"get profile successfully",data:user})
 })
 
 
@@ -84,15 +84,15 @@ export const profile=catchError(async(req, res, next)=>{
  */
 export const logout=catchError(async(req,res,next)=>{
     //get user from token
-    const token=req.headers.token.split(' ')[1]
+    const token=req.body.token
     
-    //verify access token and featch id
-    const {id}=jwt.verify(token,process.env.ACCSESS_TOKEN_SECRET)
+    //verify refresh token and featch id
+    const {id}=jwt.verify(token,process.env.REFRESH_TOKEN_SECRET)
 
     //delete refresh token
-    await Token.deleteOne({userId:id})
+    await Token.deleteOne({ userId: id, refreshToken: req.body.token });
     
-    res.json({message:"logout successfully"})
+    res.status(200).json({message:"logout successfully"})
 })
 
 
@@ -104,14 +104,15 @@ export const logout=catchError(async(req,res,next)=>{
  */
 export const refreshToken=catchError(async(req,res,next)=>{
     //get refresh token from request headers
-    const refreshToken=req.headers.token.split(' ')[1]
-    
+    const refreshToken=req.query.token
+
     //verify refresh token
     const {id}=jwt.verify(refreshToken,process.env.REFRESH_TOKEN_SECRET)
 
     //check if refresh token exists in database
     const token=await Token.findOne({refreshToken,userId:id})
     if(!token)  return next(new AppEroor("invalid refresh token",401));
+
 
     //get user from database
     const user=await User.findById(id)
@@ -121,6 +122,6 @@ export const refreshToken=catchError(async(req,res,next)=>{
     //generate new access token
     const access_token=jwt.sign({id:user._id},process.env.ACCSESS_TOKEN_SECRET,{expiresIn:"8h"})
     
-    res.json({message:"refresh token successfully",access_token})
+    res.status(200).json({message:"refresh token successfully",access_token})
 })
 

@@ -29,8 +29,18 @@ export const signinAuthSchema = {
 
 export const profileAuthSchema={
   headers:Joi.object({
-    token:Joi.string().required(),
+    authorization:Joi.string().required(),
       ...generalRules.header
+  }),
+  
+}
+export const logoutAuthSchema={
+  headers:Joi.object({
+    authorization:Joi.string().required(),
+      ...generalRules.header
+  }),
+  body: Joi.object({
+    token:Joi.string().required()
   })
 }
 

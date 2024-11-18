@@ -12,7 +12,7 @@ export const auth=catchError(
         //destructing the token from req
         const token=req.headers.authorization
         
-        if(!token)return next(new AppEroor('signin first',401))
+        if(!token)return next(new AppEroor('signin first',400))
     
             //verify token
             if(!token.startsWith('Bearer'))return next(new AppEroor('invalid token',401))
@@ -30,12 +30,12 @@ export const auth=catchError(
                         return next(new AppEroor('invalid token', 401));
                     }
                  }
-                if(!decodeData.id)return next(new AppEroor('invalid token',400))
+                if(!decodeData.id)return next(new AppEroor('invalid token',401))
 
                         
                     //find user
                 const user=await User.findById(decodeData.id).select('-password')
-                if(!user)return next(new AppEroor('please signup and try to login',404))
+                if(!user)return next(new AppEroor('please signup and try to login',400))
                     req.authUser=user
                     next()
                 }

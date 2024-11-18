@@ -8,7 +8,7 @@ export const authorization=(allowedRules)=>{
         async(req,res,next) => {
             const user=req.authUser.role
             if(!allowedRules.includes(user))
-                return next(new AppEroor('Authrization Error',401,'you are not allowed to access this route'))
+                return next(new AppEroor('Authrization Error',403,'you are not allowed to access this route'))
             next()
         }
     )

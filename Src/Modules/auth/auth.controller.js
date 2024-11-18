@@ -35,11 +35,11 @@ res.status(201).json({message:"register successfully",data:userData})
 export const signin=catchError(async(req,res,next)=>{
     //chick if phone number exists
     const user=await User.findOne({phone:req.body.phone})
-    if(!user)  return next(new AppEroor("phone or password is incorrect",401));
+    if(!user)  return next(new AppEroor("phone or password is incorrect",400));
     
     //compare password
     const isMatch=await bcrypt.compare(req.body.password,user.password)
-    if(!isMatch)  return next(new AppEroor("phone or password is incorrect",401));
+    if(!isMatch)  return next(new AppEroor("phone or password is incorrect",400));
     
     //generate access token
     const access_token=jwt.sign({id:user._id},process.env.ACCSESS_TOKEN_SECRET,{expiresIn:"8h"})
@@ -111,13 +111,13 @@ export const refreshToken=catchError(async(req,res,next)=>{
 
     //check if refresh token exists in database
     const token=await Token.findOne({refreshToken,userId:id})
-    if(!token)  return next(new AppEroor("invalid refresh token",401));
+    if(!token)  return next(new AppEroor("invalid refresh token",403));
 
 
     //get user from database
     const user=await User.findById(id)
     
-    if(!user)  return next(new AppEroor("invalid refresh token",401));
+    if(!user)  return next(new AppEroor("invalid refresh token",403));
     
     //generate new access token
     const access_token=jwt.sign({id:user._id},process.env.ACCSESS_TOKEN_SECRET,{expiresIn:"8h"})
